@@ -1,0 +1,36 @@
+CREATE LOGIN Admin
+WITH
+PASSWORD = '123'
+, CHECK_POLICY = OFF
+GO
+IF @@ERROR <> 0
+  OR @@TRANCOUNT = 0
+BEGIN
+  IF @@TRANCOUNT > 0
+    ROLLBACK
+  SET NOEXEC ON
+END
+GO
+
+--
+-- Фиксировать транзакцию
+--
+IF @@TRANCOUNT > 0
+  COMMIT TRANSACTION
+GO
+
+--
+-- Добавить члены в роль [sysadmin]
+--
+EXEC sp_addsrvrolemember N'Admin'
+                        ,N'sysadmin'
+GO
+IF @@ERROR <> 0
+  SET NOEXEC ON
+GO
+
+--
+-- Установить NOEXEC в состояние off
+--
+SET NOEXEC OFF
+GO
